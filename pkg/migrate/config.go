@@ -26,8 +26,6 @@ var supportedChannels = map[string]bool{
 	"discord":  true,
 	"whatsapp": true,
 	"feishu":   true,
-	"qq":       true,
-	"dingtalk": true,
 	"maixcam":  true,
 }
 
@@ -170,24 +168,6 @@ func ConvertConfig(data map[string]interface{}) (*config.Config, []string, error
 				if v, ok := getString(cMap, "verification_token"); ok {
 					cfg.Channels.Feishu.VerificationToken = v
 				}
-			case "qq":
-				cfg.Channels.QQ.Enabled = enabled
-				cfg.Channels.QQ.AllowFrom = allowFrom
-				if v, ok := getString(cMap, "app_id"); ok {
-					cfg.Channels.QQ.AppID = v
-				}
-				if v, ok := getString(cMap, "app_secret"); ok {
-					cfg.Channels.QQ.AppSecret = v
-				}
-			case "dingtalk":
-				cfg.Channels.DingTalk.Enabled = enabled
-				cfg.Channels.DingTalk.AllowFrom = allowFrom
-				if v, ok := getString(cMap, "client_id"); ok {
-					cfg.Channels.DingTalk.ClientID = v
-				}
-				if v, ok := getString(cMap, "client_secret"); ok {
-					cfg.Channels.DingTalk.ClientSecret = v
-				}
 			case "maixcam":
 				cfg.Channels.MaixCam.Enabled = enabled
 				cfg.Channels.MaixCam.AllowFrom = allowFrom
@@ -265,12 +245,6 @@ func MergeConfig(existing, incoming *config.Config) *config.Config {
 	}
 	if !existing.Channels.Feishu.Enabled && incoming.Channels.Feishu.Enabled {
 		existing.Channels.Feishu = incoming.Channels.Feishu
-	}
-	if !existing.Channels.QQ.Enabled && incoming.Channels.QQ.Enabled {
-		existing.Channels.QQ = incoming.Channels.QQ
-	}
-	if !existing.Channels.DingTalk.Enabled && incoming.Channels.DingTalk.Enabled {
-		existing.Channels.DingTalk = incoming.Channels.DingTalk
 	}
 	if !existing.Channels.MaixCam.Enabled && incoming.Channels.MaixCam.Enabled {
 		existing.Channels.MaixCam = incoming.Channels.MaixCam

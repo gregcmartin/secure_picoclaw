@@ -59,7 +59,7 @@ func (m *Manager) initChannels() error {
 		}
 	}
 
-	if m.config.Channels.WhatsApp.Enabled && m.config.Channels.WhatsApp.BridgeURL != "" {
+	if m.config.Channels.WhatsApp.Enabled {
 		logger.DebugC("channels", "Attempting to initialize WhatsApp channel")
 		whatsapp, err := NewWhatsAppChannel(m.config.Channels.WhatsApp, m.bus)
 		if err != nil {
@@ -111,32 +111,6 @@ func (m *Manager) initChannels() error {
 		}
 	}
 
-	if m.config.Channels.QQ.Enabled {
-		logger.DebugC("channels", "Attempting to initialize QQ channel")
-		qq, err := NewQQChannel(m.config.Channels.QQ, m.bus)
-		if err != nil {
-			logger.ErrorCF("channels", "Failed to initialize QQ channel", map[string]interface{}{
-				"error": err.Error(),
-			})
-		} else {
-			m.channels["qq"] = qq
-			logger.InfoC("channels", "QQ channel enabled successfully")
-		}
-	}
-
-	if m.config.Channels.DingTalk.Enabled && m.config.Channels.DingTalk.ClientID != "" {
-		logger.DebugC("channels", "Attempting to initialize DingTalk channel")
-		dingtalk, err := NewDingTalkChannel(m.config.Channels.DingTalk, m.bus)
-		if err != nil {
-			logger.ErrorCF("channels", "Failed to initialize DingTalk channel", map[string]interface{}{
-				"error": err.Error(),
-			})
-		} else {
-			m.channels["dingtalk"] = dingtalk
-			logger.InfoC("channels", "DingTalk channel enabled successfully")
-		}
-	}
-
 	if m.config.Channels.Slack.Enabled && m.config.Channels.Slack.BotToken != "" {
 		logger.DebugC("channels", "Attempting to initialize Slack channel")
 		slackCh, err := NewSlackChannel(m.config.Channels.Slack, m.bus)
@@ -147,19 +121,6 @@ func (m *Manager) initChannels() error {
 		} else {
 			m.channels["slack"] = slackCh
 			logger.InfoC("channels", "Slack channel enabled successfully")
-		}
-	}
-
-	if m.config.Channels.LINE.Enabled && m.config.Channels.LINE.ChannelAccessToken != "" {
-		logger.DebugC("channels", "Attempting to initialize LINE channel")
-		line, err := NewLINEChannel(m.config.Channels.LINE, m.bus)
-		if err != nil {
-			logger.ErrorCF("channels", "Failed to initialize LINE channel", map[string]interface{}{
-				"error": err.Error(),
-			})
-		} else {
-			m.channels["line"] = line
-			logger.InfoC("channels", "LINE channel enabled successfully")
 		}
 	}
 

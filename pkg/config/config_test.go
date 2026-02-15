@@ -120,12 +120,6 @@ func TestDefaultConfig_Channels(t *testing.T) {
 	if cfg.Channels.MaixCam.Enabled {
 		t.Error("MaixCam should be disabled by default")
 	}
-	if cfg.Channels.QQ.Enabled {
-		t.Error("QQ should be disabled by default")
-	}
-	if cfg.Channels.DingTalk.Enabled {
-		t.Error("DingTalk should be disabled by default")
-	}
 	if cfg.Channels.Slack.Enabled {
 		t.Error("Slack should be disabled by default")
 	}
