@@ -293,8 +293,8 @@ func TestConvertConfig(t *testing.T) {
 		if len(warnings) != 0 {
 			t.Errorf("expected no warnings, got %v", warnings)
 		}
-		if cfg.Agents.Defaults.Model != "gpt-4o" {
-			t.Errorf("default model should be gpt-4o, got %q", cfg.Agents.Defaults.Model)
+		if cfg.Agents.Defaults.Model != "gpt-5.3" {
+			t.Errorf("default model should be gpt-5.3, got %q", cfg.Agents.Defaults.Model)
 		}
 	})
 }

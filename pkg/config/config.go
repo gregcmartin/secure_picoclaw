@@ -163,7 +163,7 @@ func DefaultConfig() *Config {
 				Workspace:           "~/.picoclaw/workspace",
 				RestrictToWorkspace: true,
 				Provider:            "",
-				Model:               "gpt-4o",
+				Model:               "gpt-5.3",
 				MaxTokens:           8192,
 				Temperature:         0.7,
 				MaxToolIterations:   20,
