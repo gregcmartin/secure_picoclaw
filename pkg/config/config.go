@@ -71,10 +71,8 @@ type AgentDefaults struct {
 type ChannelsConfig struct {
 	WhatsApp WhatsAppConfig `json:"whatsapp"`
 	Telegram TelegramConfig `json:"telegram"`
-	Feishu   FeishuConfig   `json:"feishu"`
 	Discord  DiscordConfig  `json:"discord"`
-	MaixCam  MaixCamConfig  `json:"maixcam"`
-	Slack   SlackConfig `json:"slack"`
+	Slack    SlackConfig    `json:"slack"`
 }
 
 type WhatsAppConfig struct {
@@ -91,26 +89,10 @@ type TelegramConfig struct {
 	AllowFrom FlexibleStringSlice `json:"allow_from" env:"PICOCLAW_CHANNELS_TELEGRAM_ALLOW_FROM"`
 }
 
-type FeishuConfig struct {
-	Enabled           bool                `json:"enabled" env:"PICOCLAW_CHANNELS_FEISHU_ENABLED"`
-	AppID             string              `json:"app_id" env:"PICOCLAW_CHANNELS_FEISHU_APP_ID"`
-	AppSecret         string              `json:"app_secret" env:"PICOCLAW_CHANNELS_FEISHU_APP_SECRET"`
-	EncryptKey        string              `json:"encrypt_key" env:"PICOCLAW_CHANNELS_FEISHU_ENCRYPT_KEY"`
-	VerificationToken string              `json:"verification_token" env:"PICOCLAW_CHANNELS_FEISHU_VERIFICATION_TOKEN"`
-	AllowFrom         FlexibleStringSlice `json:"allow_from" env:"PICOCLAW_CHANNELS_FEISHU_ALLOW_FROM"`
-}
-
 type DiscordConfig struct {
 	Enabled   bool                `json:"enabled" env:"PICOCLAW_CHANNELS_DISCORD_ENABLED"`
 	Token     string              `json:"token" env:"PICOCLAW_CHANNELS_DISCORD_TOKEN"`
 	AllowFrom FlexibleStringSlice `json:"allow_from" env:"PICOCLAW_CHANNELS_DISCORD_ALLOW_FROM"`
-}
-
-type MaixCamConfig struct {
-	Enabled   bool                `json:"enabled" env:"PICOCLAW_CHANNELS_MAIXCAM_ENABLED"`
-	Host      string              `json:"host" env:"PICOCLAW_CHANNELS_MAIXCAM_HOST"`
-	Port      int                 `json:"port" env:"PICOCLAW_CHANNELS_MAIXCAM_PORT"`
-	AllowFrom FlexibleStringSlice `json:"allow_from" env:"PICOCLAW_CHANNELS_MAIXCAM_ALLOW_FROM"`
 }
 
 type SlackConfig struct {
@@ -135,13 +117,9 @@ type ProvidersConfig struct {
 	OpenAI        ProviderConfig `json:"openai"`
 	OpenRouter    ProviderConfig `json:"openrouter"`
 	Groq          ProviderConfig `json:"groq"`
-	Zhipu         ProviderConfig `json:"zhipu"`
 	VLLM          ProviderConfig `json:"vllm"`
 	Gemini        ProviderConfig `json:"gemini"`
 	Nvidia        ProviderConfig `json:"nvidia"`
-	Moonshot      ProviderConfig `json:"moonshot"`
-	ShengSuanYun  ProviderConfig `json:"shengsuanyun"`
-	DeepSeek      ProviderConfig `json:"deepseek"`
 	GitHubCopilot ProviderConfig `json:"github_copilot"`
 }
 
@@ -185,7 +163,7 @@ func DefaultConfig() *Config {
 				Workspace:           "~/.picoclaw/workspace",
 				RestrictToWorkspace: true,
 				Provider:            "",
-				Model:               "glm-4.7",
+				Model:               "gpt-4o",
 				MaxTokens:           8192,
 				Temperature:         0.7,
 				MaxToolIterations:   20,
@@ -203,23 +181,9 @@ func DefaultConfig() *Config {
 				Token:     "",
 				AllowFrom: FlexibleStringSlice{},
 			},
-			Feishu: FeishuConfig{
-				Enabled:           false,
-				AppID:             "",
-				AppSecret:         "",
-				EncryptKey:        "",
-				VerificationToken: "",
-				AllowFrom:         FlexibleStringSlice{},
-			},
 			Discord: DiscordConfig{
 				Enabled:   false,
 				Token:     "",
-				AllowFrom: FlexibleStringSlice{},
-			},
-			MaixCam: MaixCamConfig{
-				Enabled:   false,
-				Host:      "0.0.0.0",
-				Port:      18790,
 				AllowFrom: FlexibleStringSlice{},
 			},
 			Slack: SlackConfig{
@@ -230,16 +194,13 @@ func DefaultConfig() *Config {
 			},
 		},
 		Providers: ProvidersConfig{
-			Anthropic:    ProviderConfig{},
-			OpenAI:       ProviderConfig{},
-			OpenRouter:   ProviderConfig{},
-			Groq:         ProviderConfig{},
-			Zhipu:        ProviderConfig{},
-			VLLM:         ProviderConfig{},
-			Gemini:       ProviderConfig{},
-			Nvidia:       ProviderConfig{},
-			Moonshot:     ProviderConfig{},
-			ShengSuanYun: ProviderConfig{},
+			Anthropic:  ProviderConfig{},
+			OpenAI:     ProviderConfig{},
+			OpenRouter: ProviderConfig{},
+			Groq:       ProviderConfig{},
+			VLLM:       ProviderConfig{},
+			Gemini:     ProviderConfig{},
+			Nvidia:     ProviderConfig{},
 		},
 		Gateway: GatewayConfig{
 			Host: "0.0.0.0",
@@ -329,17 +290,11 @@ func (c *Config) GetAPIKey() string {
 	if c.Providers.Gemini.APIKey != "" {
 		return c.Providers.Gemini.APIKey
 	}
-	if c.Providers.Zhipu.APIKey != "" {
-		return c.Providers.Zhipu.APIKey
-	}
 	if c.Providers.Groq.APIKey != "" {
 		return c.Providers.Groq.APIKey
 	}
 	if c.Providers.VLLM.APIKey != "" {
 		return c.Providers.VLLM.APIKey
-	}
-	if c.Providers.ShengSuanYun.APIKey != "" {
-		return c.Providers.ShengSuanYun.APIKey
 	}
 	return ""
 }
@@ -352,9 +307,6 @@ func (c *Config) GetAPIBase() string {
 			return c.Providers.OpenRouter.APIBase
 		}
 		return "https://openrouter.ai/api/v1"
-	}
-	if c.Providers.Zhipu.APIKey != "" {
-		return c.Providers.Zhipu.APIBase
 	}
 	if c.Providers.VLLM.APIKey != "" && c.Providers.VLLM.APIBase != "" {
 		return c.Providers.VLLM.APIBase

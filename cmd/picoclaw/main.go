@@ -156,7 +156,7 @@ func main() {
 
 		workspace := cfg.WorkspacePath()
 		installer := skills.NewSkillInstaller(workspace)
-		// 获取全局配置目录和内置 skills 目录
+		// Get global config directory and builtin skills directory
 		globalDir := filepath.Dir(getConfigPath())
 		globalSkillsDir := filepath.Join(globalDir, "skills")
 		builtinSkillsDir := filepath.Join(globalDir, "picoclaw", "skills")

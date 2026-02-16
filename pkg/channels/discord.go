@@ -102,7 +102,7 @@ func (c *DiscordChannel) Send(ctx context.Context, msg bus.OutboundMessage) erro
 
 	message := msg.Content
 
-	// 使用传入的 ctx 进行超时控制
+	// Use the passed-in ctx for timeout control
 	sendCtx, cancel := context.WithTimeout(ctx, sendTimeout)
 	defer cancel()
 
@@ -123,7 +123,7 @@ func (c *DiscordChannel) Send(ctx context.Context, msg bus.OutboundMessage) erro
 	}
 }
 
-// appendContent 安全地追加内容到现有文本
+// appendContent safely appends content to existing text
 func appendContent(content, suffix string) string {
 	if content == "" {
 		return suffix
@@ -140,7 +140,7 @@ func (c *DiscordChannel) handleMessage(s *discordgo.Session, m *discordgo.Messag
 		return
 	}
 
-	// 检查白名单，避免为被拒绝的用户下载附件和转录
+	// Check allowlist before downloading attachments and transcribing
 	if !c.IsAllowed(m.Author.ID) {
 		logger.DebugCF("discord", "Message rejected by allowlist", map[string]any{
 			"user_id": m.Author.ID,
@@ -158,7 +158,7 @@ func (c *DiscordChannel) handleMessage(s *discordgo.Session, m *discordgo.Messag
 	mediaPaths := make([]string, 0, len(m.Attachments))
 	localFiles := make([]string, 0, len(m.Attachments))
 
-	// 确保临时文件在函数返回时被清理
+	// Ensure temp files are cleaned up when function returns
 	defer func() {
 		for _, file := range localFiles {
 			if err := os.Remove(file); err != nil {
@@ -182,7 +182,7 @@ func (c *DiscordChannel) handleMessage(s *discordgo.Session, m *discordgo.Messag
 				if c.transcriber != nil && c.transcriber.IsAvailable() {
 					ctx, cancel := context.WithTimeout(c.getContext(), transcriptionTimeout)
 					result, err := c.transcriber.Transcribe(ctx, localPath)
-					cancel() // 立即释放context资源，避免在for循环中泄漏
+					cancel() // release context immediately to avoid leaking in loop
 
 					if err != nil {
 						logger.ErrorCF("discord", "Voice transcription failed", map[string]any{

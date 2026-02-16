@@ -53,10 +53,10 @@ func (p *HTTPProvider) Chat(ctx context.Context, messages []Message, tools []Too
 		return nil, fmt.Errorf("API base not configured")
 	}
 
-	// Strip provider prefix from model name (e.g., moonshot/kimi-k2.5 -> kimi-k2.5)
+	// Strip provider prefix from model name (e.g., nvidia/llama-3 -> llama-3)
 	if idx := strings.Index(model, "/"); idx != -1 {
 		prefix := model[:idx]
-		if prefix == "moonshot" || prefix == "nvidia" {
+		if prefix == "nvidia" {
 			model = model[idx+1:]
 		}
 	}
@@ -73,7 +73,7 @@ func (p *HTTPProvider) Chat(ctx context.Context, messages []Message, tools []Too
 
 	if maxTokens, ok := options["max_tokens"].(int); ok {
 		lowerModel := strings.ToLower(model)
-		if strings.Contains(lowerModel, "glm") || strings.Contains(lowerModel, "o1") {
+		if strings.Contains(lowerModel, "o1") {
 			requestBody["max_completion_tokens"] = maxTokens
 		} else {
 			requestBody["max_tokens"] = maxTokens
@@ -81,13 +81,7 @@ func (p *HTTPProvider) Chat(ctx context.Context, messages []Message, tools []Too
 	}
 
 	if temperature, ok := options["temperature"].(float64); ok {
-		lowerModel := strings.ToLower(model)
-		// Kimi k2 models only support temperature=1
-		if strings.Contains(lowerModel, "kimi") && strings.Contains(lowerModel, "k2") {
-			requestBody["temperature"] = 1.0
-		} else {
-			requestBody["temperature"] = temperature
-		}
+		requestBody["temperature"] = temperature
 	}
 
 	jsonData, err := json.Marshal(requestBody)
@@ -269,14 +263,6 @@ func CreateProvider(cfg *config.Config) (LLMProvider, error) {
 					apiBase = "https://openrouter.ai/api/v1"
 				}
 			}
-		case "zhipu", "glm":
-			if cfg.Providers.Zhipu.APIKey != "" {
-				apiKey = cfg.Providers.Zhipu.APIKey
-				apiBase = cfg.Providers.Zhipu.APIBase
-				if apiBase == "" {
-					apiBase = "https://open.bigmodel.cn/api/paas/v4"
-				}
-			}
 		case "gemini", "google":
 			if cfg.Providers.Gemini.APIKey != "" {
 				apiKey = cfg.Providers.Gemini.APIKey
@@ -290,31 +276,12 @@ func CreateProvider(cfg *config.Config) (LLMProvider, error) {
 				apiKey = cfg.Providers.VLLM.APIKey
 				apiBase = cfg.Providers.VLLM.APIBase
 			}
-		case "shengsuanyun":
-			if cfg.Providers.ShengSuanYun.APIKey != "" {
-				apiKey = cfg.Providers.ShengSuanYun.APIKey
-				apiBase = cfg.Providers.ShengSuanYun.APIBase
-				if apiBase == "" {
-					apiBase = "https://router.shengsuanyun.com/api/v1"
-				}
-			}
 		case "claude-cli", "claudecode", "claude-code":
 			workspace := cfg.Agents.Defaults.Workspace
 			if workspace == "" {
 				workspace = "."
 			}
 			return NewClaudeCliProvider(workspace), nil
-		case "deepseek":
-			if cfg.Providers.DeepSeek.APIKey != "" {
-				apiKey = cfg.Providers.DeepSeek.APIKey
-				apiBase = cfg.Providers.DeepSeek.APIBase
-				if apiBase == "" {
-					apiBase = "https://api.deepseek.com/v1"
-				}
-				if model != "deepseek-chat" && model != "deepseek-reasoner" {
-					model = "deepseek-chat"
-				}
-			}
 		case "github_copilot", "copilot":
 			if cfg.Providers.GitHubCopilot.APIBase != "" {
 				apiBase = cfg.Providers.GitHubCopilot.APIBase
@@ -330,15 +297,7 @@ func CreateProvider(cfg *config.Config) (LLMProvider, error) {
 	// Fallback: detect provider from model name
 	if apiKey == "" && apiBase == "" {
 		switch {
-		case (strings.Contains(lowerModel, "kimi") || strings.Contains(lowerModel, "moonshot") || strings.HasPrefix(model, "moonshot/")) && cfg.Providers.Moonshot.APIKey != "":
-			apiKey = cfg.Providers.Moonshot.APIKey
-			apiBase = cfg.Providers.Moonshot.APIBase
-			proxy = cfg.Providers.Moonshot.Proxy
-			if apiBase == "" {
-				apiBase = "https://api.moonshot.cn/v1"
-			}
-
-		case strings.HasPrefix(model, "openrouter/") || strings.HasPrefix(model, "anthropic/") || strings.HasPrefix(model, "openai/") || strings.HasPrefix(model, "meta-llama/") || strings.HasPrefix(model, "deepseek/") || strings.HasPrefix(model, "google/"):
+		case strings.HasPrefix(model, "openrouter/") || strings.HasPrefix(model, "anthropic/") || strings.HasPrefix(model, "openai/") || strings.HasPrefix(model, "meta-llama/") || strings.HasPrefix(model, "google/"):
 			apiKey = cfg.Providers.OpenRouter.APIKey
 			proxy = cfg.Providers.OpenRouter.Proxy
 			if cfg.Providers.OpenRouter.APIBase != "" {
@@ -375,14 +334,6 @@ func CreateProvider(cfg *config.Config) (LLMProvider, error) {
 			proxy = cfg.Providers.Gemini.Proxy
 			if apiBase == "" {
 				apiBase = "https://generativelanguage.googleapis.com/v1beta"
-			}
-
-		case (strings.Contains(lowerModel, "glm") || strings.Contains(lowerModel, "zhipu") || strings.Contains(lowerModel, "zai")) && cfg.Providers.Zhipu.APIKey != "":
-			apiKey = cfg.Providers.Zhipu.APIKey
-			apiBase = cfg.Providers.Zhipu.APIBase
-			proxy = cfg.Providers.Zhipu.Proxy
-			if apiBase == "" {
-				apiBase = "https://open.bigmodel.cn/api/paas/v4"
 			}
 
 		case (strings.Contains(lowerModel, "groq") || strings.HasPrefix(model, "groq/")) && cfg.Providers.Groq.APIKey != "":

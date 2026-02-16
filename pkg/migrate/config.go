@@ -16,7 +16,6 @@ var supportedProviders = map[string]bool{
 	"openai":     true,
 	"openrouter": true,
 	"groq":       true,
-	"zhipu":      true,
 	"vllm":       true,
 	"gemini":     true,
 }
@@ -25,8 +24,6 @@ var supportedChannels = map[string]bool{
 	"telegram": true,
 	"discord":  true,
 	"whatsapp": true,
-	"feishu":   true,
-	"maixcam":  true,
 }
 
 func findOpenClawConfig(openclawHome string) (string, error) {
@@ -111,8 +108,6 @@ func ConvertConfig(data map[string]interface{}) (*config.Config, []string, error
 				cfg.Providers.OpenRouter = pc
 			case "groq":
 				cfg.Providers.Groq = pc
-			case "zhipu":
-				cfg.Providers.Zhipu = pc
 			case "vllm":
 				cfg.Providers.VLLM = pc
 			case "gemini":
@@ -152,30 +147,6 @@ func ConvertConfig(data map[string]interface{}) (*config.Config, []string, error
 				cfg.Channels.WhatsApp.AllowFrom = allowFrom
 				if v, ok := getString(cMap, "bridge_url"); ok {
 					cfg.Channels.WhatsApp.BridgeURL = v
-				}
-			case "feishu":
-				cfg.Channels.Feishu.Enabled = enabled
-				cfg.Channels.Feishu.AllowFrom = allowFrom
-				if v, ok := getString(cMap, "app_id"); ok {
-					cfg.Channels.Feishu.AppID = v
-				}
-				if v, ok := getString(cMap, "app_secret"); ok {
-					cfg.Channels.Feishu.AppSecret = v
-				}
-				if v, ok := getString(cMap, "encrypt_key"); ok {
-					cfg.Channels.Feishu.EncryptKey = v
-				}
-				if v, ok := getString(cMap, "verification_token"); ok {
-					cfg.Channels.Feishu.VerificationToken = v
-				}
-			case "maixcam":
-				cfg.Channels.MaixCam.Enabled = enabled
-				cfg.Channels.MaixCam.AllowFrom = allowFrom
-				if v, ok := getString(cMap, "host"); ok {
-					cfg.Channels.MaixCam.Host = v
-				}
-				if v, ok := getFloat(cMap, "port"); ok {
-					cfg.Channels.MaixCam.Port = int(v)
 				}
 			}
 		}
@@ -224,9 +195,6 @@ func MergeConfig(existing, incoming *config.Config) *config.Config {
 	if existing.Providers.Groq.APIKey == "" {
 		existing.Providers.Groq = incoming.Providers.Groq
 	}
-	if existing.Providers.Zhipu.APIKey == "" {
-		existing.Providers.Zhipu = incoming.Providers.Zhipu
-	}
 	if existing.Providers.VLLM.APIKey == "" && existing.Providers.VLLM.APIBase == "" {
 		existing.Providers.VLLM = incoming.Providers.VLLM
 	}
@@ -243,13 +211,6 @@ func MergeConfig(existing, incoming *config.Config) *config.Config {
 	if !existing.Channels.WhatsApp.Enabled && incoming.Channels.WhatsApp.Enabled {
 		existing.Channels.WhatsApp = incoming.Channels.WhatsApp
 	}
-	if !existing.Channels.Feishu.Enabled && incoming.Channels.Feishu.Enabled {
-		existing.Channels.Feishu = incoming.Channels.Feishu
-	}
-	if !existing.Channels.MaixCam.Enabled && incoming.Channels.MaixCam.Enabled {
-		existing.Channels.MaixCam = incoming.Channels.MaixCam
-	}
-
 	if existing.Tools.Web.Brave.APIKey == "" {
 		existing.Tools.Web.Brave = incoming.Tools.Web.Brave
 	}

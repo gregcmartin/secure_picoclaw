@@ -89,9 +89,6 @@ func TestDefaultConfig_Providers(t *testing.T) {
 	if cfg.Providers.Groq.APIKey != "" {
 		t.Error("Groq API key should be empty by default")
 	}
-	if cfg.Providers.Zhipu.APIKey != "" {
-		t.Error("Zhipu API key should be empty by default")
-	}
 	if cfg.Providers.VLLM.APIKey != "" {
 		t.Error("VLLM API key should be empty by default")
 	}
@@ -111,14 +108,8 @@ func TestDefaultConfig_Channels(t *testing.T) {
 	if cfg.Channels.Telegram.Enabled {
 		t.Error("Telegram should be disabled by default")
 	}
-	if cfg.Channels.Feishu.Enabled {
-		t.Error("Feishu should be disabled by default")
-	}
 	if cfg.Channels.Discord.Enabled {
 		t.Error("Discord should be disabled by default")
-	}
-	if cfg.Channels.MaixCam.Enabled {
-		t.Error("MaixCam should be disabled by default")
 	}
 	if cfg.Channels.Slack.Enabled {
 		t.Error("Slack should be disabled by default")
